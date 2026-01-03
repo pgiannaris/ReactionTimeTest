@@ -3,9 +3,20 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <title>Reaction Time Tester</title>
     </head>
     <style>
+        html {
+            scrollbar-width: none;
+        } /* Firefox */
+        body {
+            -ms-overflow-style: none;
+        } /* IE and Edge */
+        body::-webkit-scrollbar,
+        body::-webkit-scrollbar-button {
+            display: none;
+        } /* Chrome */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,10 +25,12 @@
         }
         html {
             height: 100%;
+            overflow-x: hidden;
         }
 
         body {
             height: 100%;
+            background-color: #e6e8f4;
         }
         #text {
             font-weight: bolder;
@@ -96,30 +109,189 @@
             align-items: center;
             justify-content: center;
         }
+        #chartContainer {
+            margin: 40px auto;
+            padding: 20px;
+
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .analyticsContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 20px;
+            width: 40%;
+            border-radius: 14px;
+            background-color: white;
+
+            text-align: left;
+
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart {
+            width: 100%;
+            height: 200px;
+        }
+
+        .clearButton {
+            flex: 1;
+            height: 48px;
+
+            background: #2b87d1;
+            color: white;
+            border: none;
+            border-radius: 10px;
+
+            font-size: 16px;
+            font-weight: 500;
+
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transition: width 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        .clearButton:hover {
+            background: #1b5584;
+        }
+
+        #myChart {
+            height: 100%;
+        }
+
+        .containerBubble {
+            flex: 1;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e5e5e5;
+            border-radius: 10px;
+
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+            font-weight: 500;
+        }
+
+        .statsRow {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 16px;
+        }
+        .site-footer {
+            margin-top: 40px;
+            padding: 16px 0;
+
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #777;
+
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .analyticsContainer h2 {
+            font-size: 24px;
+            font-weight: 600;
+            font-weight: normal;
+            margin-bottom: 12px;
+            color: #222;
+        }
     </style>
     <body>
-        <nav>
+        <!-- <nav>
             <h2 style="font-weight: bolder">Reaction Time Tester</h2>
-        </nav>
+        </nav> -->
         <div id="container">
             <h1 id="text">Reaction Time Test</h1>
             <h2 id="subText">Watch the red box and click as fast as possible when the green box appears!</h2>
             <button id="mainButton" onclick="main()">Start</button>
         </div>
-        <div></div>
+        <div id="chartContainer">
+            <div class="analyticsContainer">
+                <h2>Distribution Curve</h2>
+                <img src="assets/normal.png" />
+                <p style="text-align: center; margin-top: 10px">
+                    This chart is taken from <a style="text-decoration: none" href="https://humanbenchmark.com/tests/reactiontime">Human Benchmark</a>, the
+                    average reaction time is 273ms
+                </p>
+            </div>
+            <div class="analyticsContainer">
+                <h2>Your Statistics</h2>
+                <canvas id="myChart"></canvas>
+
+                <div class="statsRow">
+                    <div class="containerBubble" id="averageDisp">Average</div>
+
+                    <div class="containerBubble" id="bestDisp">Best</div>
+
+                    <button class="clearButton" onclick="clearStorage()">Clear</button>
+                </div>
+            </div>
+            <div class="analyticsContainer" style="width: 20%">
+                <h2>Your Statistics</h2>
+                <p style="margin-top: 12px; line-height: 1.6; color: #444; font-size: 20px">
+                    This simple reaction time test measures how quickly you respond to a visual stimulus. After a random delay, the screen turns green, click as
+                    fast as possible to record your reaction time.
+                </p>
+
+                <p style="margin-top: 10px; line-height: 1.6; color: #444; font-size: 20px">
+                    Results are stored locally in your browser and displayed over time to help track consistency, improvement, and best performance. No data is
+                    sent anywhere.
+                </p>
+            </div>
+        </div>
+        <footer class="site-footer">pgiannaris</footer>
     </body>
     <script>
+        let data = localStorage.getItem("data") ? localStorage.getItem("data").split(",").map(Number) : [];
+        let myChart;
         let container = document.getElementById("container");
-        let max = 2.5;
-        let min = 1.5;
+        let max = 4;
+        let min = 3;
         let randomDelay;
         let h1Text = document.getElementById("text");
         let mainButton = document.getElementById("mainButton");
         let subText = document.getElementById("subText");
         let startTime = null;
+        let averageDisp = document.getElementById("averageDisp");
         let failed = false;
         let waiting = true;
         let finished;
+
+        function mean(arr) {
+            let total = 0;
+            let length = 0;
+            if (arr.length === 0) return "0";
+
+            for (item of arr) {
+                total += item;
+                length += 1;
+            }
+            return total / length;
+        }
+
+        //initial display avg
+
+        let bestDisp = document.getElementById("bestDisp");
+
+        function updateStats() {
+            if (data.length === 0) {
+                averageDisp.innerText = "Average: —";
+                bestDisp.innerText = "Best: —";
+                return;
+            }
+
+            averageDisp.innerText = `Average: ${mean(data).toFixed(1)}ms`;
+            bestDisp.innerText = `Best: ${Math.min(...data).toFixed(1)}ms`;
+        }
+
+        updateStats();
 
         function percentileFromScore(score, mean = 273, std = 50) {
             // Lower reaction times are better, so z = (mean - score) / std
@@ -150,6 +322,61 @@
             return sign * y;
         }
 
+        const ctx = document.getElementById("myChart").getContext("2d");
+
+        // Create chart
+        function updateChart() {
+            if (!myChart) {
+                // Create chart only once
+                myChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: data.map((_, i) => `${i + 1}`),
+                        datasets: [
+                            {
+                                label: "",
+                                data: data,
+                                borderColor: "rgb(43, 135, 209)",
+                                backgroundColor: "rgba(43, 135, 209, 0.2)",
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                            },
+                        ],
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: { display: true, text: "Milliseconds" },
+                            },
+                            x: {
+                                title: { display: true, text: "Attempt" },
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hides all text in the legend and the associated labels
+                            },
+                        },
+                    },
+                });
+            } else {
+                // Update chart data
+                myChart.data.labels = data.map((_, i) => `${i + 1}`);
+                myChart.data.datasets[0].data = data;
+                myChart.update();
+            }
+        }
+        updateChart();
+
+        function clearStorage() {
+            localStorage.removeItem("data");
+            data = [];
+            updateChart();
+            updateStats();
+        }
+
         function main() {
             startTime = null;
             waiting = true;
@@ -160,7 +387,7 @@
             mainButton.style.display = "none";
             h1Text.innerText = "Wait";
             subText.innerText = "";
-            container.style.backgroundColor = "red";
+            container.style.backgroundColor = "#B80C09";
 
             setTimeout(() => {
                 if (!failed && !finished) {
@@ -171,10 +398,10 @@
                 }
             }, randomDelay * 1000);
 
-            document.addEventListener("click", handleClick);
+            container.addEventListener("pointerdown", handleClick);
 
             function handleClick(e) {
-                console.log(e);
+                if (!container.contains(e.target)) return;
                 if (e.target.tagName === "BUTTON") return;
                 if (waiting) {
                     failed = true;
@@ -183,15 +410,19 @@
                     h1Text.innerText = "Test Failed";
                     mainButton.style.display = "block";
                     mainButton.innerText = "Retry";
-                    document.removeEventListener("click", handleClick);
+                    container.removeEventListener("pointerdown", handleClick);
                 }
                 if (startTime !== null) {
                     const reactionTime = performance.now() - startTime;
                     finished = true;
-                    document.removeEventListener("click", handleClick);
+                    container.removeEventListener("pointerdown", handleClick);
                     container.style.backgroundColor = "#2b87d1";
                     h1Text.innerText = `${reactionTime.toFixed(1)}ms`;
                     subText.innerText = `Your precentile was: ${percentileFromScore(reactionTime)}%`;
+                    data.push(Number(reactionTime.toFixed(1)));
+                    localStorage.setItem("data", data);
+                    updateChart();
+                    updateStats();
                     mainButton.innerHTML = "Retry";
                     mainButton.style.display = "block";
                 }
@@ -199,4 +430,3 @@
         }
     </script>
 </html>
-
