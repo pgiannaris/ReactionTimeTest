@@ -3,43 +3,38 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" type="image/x-icon" href="assets/favicon.png">
+        <link rel="icon" type="image/x-icon" href="assets/favicon.png" />
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <title>Reaction Time Tester</title>
     </head>
     <style>
         html {
+            height: 100%;
+            overflow-x: hidden;
             scrollbar-width: none;
-        } /* Firefox */
+        }
         body {
+            height: 100%;
+            background-color: #e6e8f4;
             -ms-overflow-style: none;
-        } /* IE and Edge */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
         body::-webkit-scrollbar,
         body::-webkit-scrollbar-button {
             display: none;
-        } /* Chrome */
+        }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-        html {
-            height: 100%;
-            overflow-x: hidden;
         }
 
-        body {
-            height: 100%;
-            background-color: #e6e8f4;
-        }
         #text {
             font-weight: bolder;
             font-size: 60px;
             color: white;
             text-align: center;
         }
-
         #subText {
             margin-top: 20px;
             margin-bottom: 35px;
@@ -48,75 +43,54 @@
             color: white;
             text-align: center;
         }
-
         #mainButton {
             display: block;
-
             padding: 14px 40px;
-
             font-size: 22px;
             font-weight: 500;
-
             color: black;
             background-color: #e5e5e5;
-
             border: 2px solid #b5b5b5;
             border-radius: 10px;
-
             cursor: pointer;
-
             transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
         }
-
         #mainButton:hover {
             background-color: #eeeeee;
             border-color: #9a9a9a;
         }
-
         #mainButton:active {
             transform: scale(0.98);
             background-color: #dcdcdc;
         }
-
         #mainButton:focus-visible {
             outline: none;
             border-color: #6b6b6b;
         }
 
-        nav {
-            background: #ffffff;
-            color: black;
-            padding: 14px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        h2 {
-            text-align: center;
-        }
-
         #container {
             width: 100%;
-
             padding: 40px 20px;
             height: 60%;
             background-color: #2b87d1;
             border-radius: 0px 0px 30px 30px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            margin: 0px auto;
+            margin: 0 auto;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        #chartContainer {
-            margin: 40px auto;
-            padding: 20px;
 
-            display: flex;
+        #chartContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 24px;
-            justify-content: center;
+            padding: 20px;
+            margin: 40px auto;
+            margin-left: 50px;
+            margin-right: 50px;
         }
 
         .analyticsContainer {
@@ -124,13 +98,23 @@
             flex-direction: column;
             gap: 16px;
             padding: 20px;
-            width: 40%;
             border-radius: 14px;
             background-color: white;
-
             text-align: left;
-
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .analyticsContainer h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #222;
+        }
+
+        .analyticsContainer p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .chart {
@@ -141,41 +125,29 @@
         .clearButton {
             flex: 1;
             height: 48px;
-
             background: #2b87d1;
             color: white;
             border: none;
             border-radius: 10px;
-
             font-size: 16px;
             font-weight: 500;
-
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
             transition: width 0.2s ease-in-out, background-color 0.2s ease-in-out;
         }
-
         .clearButton:hover {
             background: #1b5584;
-        }
-
-        #myChart {
-            height: 100%;
         }
 
         .containerBubble {
             flex: 1;
             height: 48px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background: #e5e5e5;
             border-radius: 10px;
-
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-
             font-weight: 500;
         }
 
@@ -185,23 +157,15 @@
             width: 100%;
             margin-top: 16px;
         }
+
         .site-footer {
             margin-top: 40px;
             padding: 16px 0;
-
             text-align: center;
             font-size: 14px;
             font-weight: 500;
             color: #777;
-
             border-top: 1px solid rgba(0, 0, 0, 0.08);
-        }
-        .analyticsContainer h2 {
-            font-size: 24px;
-            font-weight: 600;
-            font-weight: normal;
-            margin-bottom: 12px;
-            color: #222;
         }
     </style>
     <body>
@@ -234,7 +198,7 @@
                     <button class="clearButton" onclick="clearStorage()">Clear</button>
                 </div>
             </div>
-            <div class="analyticsContainer" style="width: 20%">
+            <div class="analyticsContainer">
                 <h2>Your Statistics</h2>
                 <p style="margin-top: 12px; line-height: 1.6; color: #444; font-size: 20px">
                     This simple reaction time test measures how quickly you respond to a visual stimulus. After a random delay, the screen turns green, click as
@@ -429,7 +393,32 @@
                 }
             }
         }
+        function windowResizing() {
+            const chartContainer = document.getElementById("chartContainer");
+            const statsDiv = chartContainer.querySelectorAll(".analyticsContainer")[1];
+            const distDiv = chartContainer.querySelectorAll(".analyticsContainer")[0];
+
+            function reorderGridIfOneColumn() {
+                const style = window.getComputedStyle(chartContainer);
+                const columns = style.gridTemplateColumns.split(" ").length;
+
+                if (columns === 1) {
+                    // Move statsDiv before distDiv
+                    chartContainer.insertBefore(statsDiv, distDiv);
+                    // chartContainer.style.marginRight = "50px";
+                    // chartContainer.style.marginLeft = "50px";
+                } else {
+                    // Make sure original order is restored if more than 1 column
+                    chartContainer.insertBefore(distDiv, statsDiv);
+                }
+            }
+
+            // Run on page load
+            reorderGridIfOneColumn();
+
+            // Optional: Run on window resize to adapt dynamically
+            window.addEventListener("resize", reorderGridIfOneColumn);
+        }
+        windowResizing();
     </script>
 </html>
-
-
