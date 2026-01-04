@@ -14,7 +14,7 @@
             scrollbar-width: none;
         }
         body {
-            height: 100%;
+            min-height: 100%;
             background-color: #e6e8f4;
             -ms-overflow-style: none;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -31,22 +31,27 @@
 
         #text {
             font-weight: bolder;
-            font-size: 60px;
+            font-size: clamp(32px, 8vw, 60px);
             color: white;
             text-align: center;
+            line-height: 1.2;
         }
+
         #subText {
             margin-top: 20px;
             margin-bottom: 35px;
             font-weight: normal;
+            font-size: clamp(14px, 3vw, 18px);
             display: block;
             color: white;
             text-align: center;
+            padding: 0 20px;
         }
+
         #mainButton {
             display: block;
             padding: 14px 40px;
-            font-size: 22px;
+            font-size: clamp(16px, 4vw, 22px);
             font-weight: 500;
             color: black;
             background-color: #e5e5e5;
@@ -54,15 +59,20 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+            min-height: 48px;
+            touch-action: manipulation;
         }
+
         #mainButton:hover {
             background-color: #eeeeee;
             border-color: #9a9a9a;
         }
+
         #mainButton:active {
             transform: scale(0.98);
             background-color: #dcdcdc;
         }
+
         #mainButton:focus-visible {
             outline: none;
             border-color: #6b6b6b;
@@ -70,8 +80,8 @@
 
         #container {
             width: 100%;
-            padding: 40px 20px;
-            height: 60%;
+            padding: clamp(20px, 5vw, 40px);
+            min-height: 50vh;
             background-color: #2b87d1;
             border-radius: 0px 0px 30px 30px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
@@ -81,23 +91,43 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            touch-action: manipulation;
         }
 
         #chartContainer {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 24px;
-            padding: 20px;
-            margin: 40px auto;
-            margin-left: 50px;
-            margin-right: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+            gap: clamp(16px, 3vw, 24px);
+            padding: clamp(12px, 3vw, 20px);
+            margin: clamp(20px, 5vw, 40px) clamp(12px, 3vw, 20px);
+            max-width: 1400px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Optimize the about section to be more compact */
+        .analyticsContainer:last-child {
+            padding: clamp(14px, 2.5vw, 18px);
+            gap: clamp(8px, 1.5vw, 12px);
+        }
+
+        .analyticsContainer:last-child h2 {
+            font-size: clamp(16px, 3.5vw, 20px);
+            margin-bottom: 8px;
+        }
+
+        .analyticsContainer:last-child p {
+            font-size: clamp(13px, 2.5vw, 16px);
+            line-height: 1.5;
+            margin-top: 8px !important;
         }
 
         .analyticsContainer {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            padding: 20px;
+            gap: clamp(12px, 2vw, 16px);
+            padding: clamp(16px, 3vw, 20px);
             border-radius: 14px;
             background-color: white;
             text-align: left;
@@ -105,7 +135,7 @@
         }
 
         .analyticsContainer h2 {
-            font-size: 24px;
+            font-size: clamp(18px, 4vw, 24px);
             font-weight: 600;
             margin-bottom: 12px;
             color: #222;
@@ -115,6 +145,15 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: break-word;
+            font-size: clamp(14px, 3vw, 18px);
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .analyticsContainer img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
 
         .chart {
@@ -124,24 +163,26 @@
 
         .clearButton {
             flex: 1;
-            height: 48px;
+            min-height: 48px;
             background: #2b87d1;
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: clamp(14px, 3vw, 16px);
             font-weight: 500;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-            transition: width 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            transition: background-color 0.2s ease-in-out;
+            touch-action: manipulation;
         }
+
         .clearButton:hover {
             background: #1b5584;
         }
 
         .containerBubble {
             flex: 1;
-            height: 48px;
+            min-height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -149,29 +190,41 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
             font-weight: 500;
+            font-size: clamp(13px, 2.5vw, 16px);
+            padding: 8px 12px;
+            text-align: center;
         }
 
         .statsRow {
             display: flex;
+            flex-wrap: wrap;
             gap: 12px;
             width: 100%;
             margin-top: 16px;
         }
 
         .site-footer {
-            margin-top: 40px;
+            margin-top: clamp(20px, 5vw, 40px);
             padding: 16px 0;
             text-align: center;
-            font-size: 14px;
+            font-size: clamp(12px, 2.5vw, 14px);
             font-weight: 500;
             color: #777;
             border-top: 1px solid rgba(0, 0, 0, 0.08);
         }
+
+        /* Tablet breakpoint */
+        @media (max-width: 900px) {
+            #chartContainer {
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+            }
+        }
+
+        /* Mobile breakpoint */
+
+        /* Very small mobile */
     </style>
     <body>
-        <!-- <nav>
-            <h2 style="font-weight: bolder">Reaction Time Tester</h2>
-        </nav> -->
         <div id="container">
             <h1 id="text">Reaction Time Test</h1>
             <h2 id="subText">Watch the red box and click as fast as possible when the green box appears!</h2>
@@ -180,10 +233,11 @@
         <div id="chartContainer">
             <div class="analyticsContainer">
                 <h2>Distribution Curve</h2>
-                <img src="assets/normal.png" />
+                <img src="assets/normal.png" alt="Normal distribution curve" />
                 <p style="text-align: center; margin-top: 10px">
-                    This chart is taken from <a style="text-decoration: none" href="https://humanbenchmark.com/tests/reactiontime">Human Benchmark</a>, the
-                    average reaction time is 273ms
+                    This chart is taken from
+                    <a style="text-decoration: none; color: #2b87d1" href="https://humanbenchmark.com/tests/reactiontime">Human Benchmark</a>, the average
+                    reaction time is 273ms
                 </p>
             </div>
             <div class="analyticsContainer">
@@ -191,21 +245,19 @@
                 <canvas id="myChart"></canvas>
 
                 <div class="statsRow">
-                    <div class="containerBubble" id="averageDisp">Average</div>
-
-                    <div class="containerBubble" id="bestDisp">Best</div>
-
-                    <button class="clearButton" onclick="clearStorage()">Clear</button>
+                    <div class="containerBubble" id="averageDisp">Average: —</div>
+                    <div class="containerBubble" id="bestDisp">Best: —</div>
+                    <button class="clearButton" onclick="clearStorage()">Clear Data</button>
                 </div>
             </div>
             <div class="analyticsContainer">
-                <h2>Your Statistics</h2>
-                <p style="margin-top: 12px; line-height: 1.6; color: #444; font-size: 20px">
-                    This simple reaction time test measures how quickly you respond to a visual stimulus. After a random delay, the screen turns green, click as
-                    fast as possible to record your reaction time.
+                <h2>About This Test</h2>
+                <p style="margin-top: 12px">
+                    This simple reaction time test measures how quickly you respond to a visual stimulus. After a random delay, the screen turns green — click
+                    as fast as possible to record your reaction time.
                 </p>
 
-                <p style="margin-top: 10px; line-height: 1.6; color: #444; font-size: 20px">
+                <p style="margin-top: 10px">
                     Results are stored locally in your browser and displayed over time to help track consistency, improvement, and best performance. No data is
                     sent anywhere.
                 </p>
@@ -214,36 +266,27 @@
         <footer class="site-footer">pgiannaris</footer>
     </body>
     <script>
-        let data = localStorage.getItem("data") ? localStorage.getItem("data").split(",").map(Number) : [];
+        let data = [];
+        let timeoutID = null;
         let myChart;
         let container = document.getElementById("container");
-        let max = 4;
-        let min = 3;
+        let max = 5;
+        let min = 4;
         let randomDelay;
         let h1Text = document.getElementById("text");
         let mainButton = document.getElementById("mainButton");
         let subText = document.getElementById("subText");
         let startTime = null;
         let averageDisp = document.getElementById("averageDisp");
+        let bestDisp = document.getElementById("bestDisp");
         let failed = false;
         let waiting = true;
         let finished;
 
         function mean(arr) {
-            let total = 0;
-            let length = 0;
-            if (arr.length === 0) return "0";
-
-            for (item of arr) {
-                total += item;
-                length += 1;
-            }
-            return total / length;
+            if (arr.length === 0) return 0;
+            return arr.reduce((sum, val) => sum + val, 0) / arr.length;
         }
-
-        //initial display avg
-
-        let bestDisp = document.getElementById("bestDisp");
 
         function updateStats() {
             if (data.length === 0) {
@@ -259,16 +302,11 @@
         updateStats();
 
         function percentileFromScore(score, mean = 273, std = 50) {
-            // Lower reaction times are better, so z = (mean - score) / std
             let z = (mean - score) / std;
-
-            // CDF approximation using error function
             let percentile = 0.5 * (1 + erf(z / Math.sqrt(2)));
-
             return (percentile * 100).toFixed(0);
         }
 
-        // Error function approximation
         function erf(x) {
             const a1 = 0.254829592;
             const a2 = -0.284496736;
@@ -277,8 +315,7 @@
             const a5 = 1.061405429;
             const p = 0.3275911;
 
-            let sign = 1;
-            if (x < 0) sign = -1;
+            let sign = x < 0 ? -1 : 1;
             x = Math.abs(x);
 
             let t = 1 / (1 + p * x);
@@ -289,17 +326,15 @@
 
         const ctx = document.getElementById("myChart").getContext("2d");
 
-        // Create chart
         function updateChart() {
             if (!myChart) {
-                // Create chart only once
                 myChart = new Chart(ctx, {
                     type: "line",
                     data: {
                         labels: data.map((_, i) => `${i + 1}`),
                         datasets: [
                             {
-                                label: "",
+                                label: "Reaction Time",
                                 data: data,
                                 borderColor: "rgb(43, 135, 209)",
                                 backgroundColor: "rgba(43, 135, 209, 0.2)",
@@ -310,6 +345,8 @@
                         ],
                     },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
                         scales: {
                             y: {
                                 beginAtZero: false,
@@ -321,13 +358,12 @@
                         },
                         plugins: {
                             legend: {
-                                display: false, // Hides all text in the legend and the associated labels
+                                display: false,
                             },
                         },
                     },
                 });
             } else {
-                // Update chart data
                 myChart.data.labels = data.map((_, i) => `${i + 1}`);
                 myChart.data.datasets[0].data = data;
                 myChart.update();
@@ -336,13 +372,13 @@
         updateChart();
 
         function clearStorage() {
-            localStorage.removeItem("data");
             data = [];
             updateChart();
             updateStats();
         }
 
         function main() {
+            if (timeoutID) clearTimeout(timeoutID);
             startTime = null;
             waiting = true;
             failed = false;
@@ -354,38 +390,38 @@
             subText.innerText = "";
             container.style.backgroundColor = "#B80C09";
 
-            setTimeout(() => {
+            timeoutID = setTimeout(() => {
                 if (!failed && !finished) {
                     startTime = performance.now();
                     waiting = false;
                     container.style.backgroundColor = "green";
                     h1Text.innerText = "Click!";
+                    container.addEventListener("pointerdown", handleClick);
                 }
             }, randomDelay * 1000);
 
-            container.addEventListener("pointerdown", handleClick);
-
             function handleClick(e) {
+                e.stopPropagation();
                 if (!container.contains(e.target)) return;
                 if (e.target.tagName === "BUTTON") return;
+
                 if (waiting) {
+                    clearTimeout(timeoutID);
                     failed = true;
                     container.style.backgroundColor = "darkred";
-                    subText.innerText = "Clicked too soon";
+                    subText.innerText = "Clicked too soon!";
                     h1Text.innerText = "Test Failed";
                     mainButton.style.display = "block";
                     mainButton.innerText = "Retry";
                     container.removeEventListener("pointerdown", handleClick);
-                }
-                if (startTime !== null) {
+                } else if (startTime !== null) {
                     const reactionTime = performance.now() - startTime;
                     finished = true;
                     container.removeEventListener("pointerdown", handleClick);
                     container.style.backgroundColor = "#2b87d1";
                     h1Text.innerText = `${reactionTime.toFixed(1)}ms`;
-                    subText.innerText = `Your precentile was: ${percentileFromScore(reactionTime)}%`;
+                    subText.innerText = `Your percentile: ${percentileFromScore(reactionTime)}%`;
                     data.push(Number(reactionTime.toFixed(1)));
-                    localStorage.setItem("data", data);
                     updateChart();
                     updateStats();
                     mainButton.innerHTML = "Retry";
@@ -393,6 +429,7 @@
                 }
             }
         }
+
         function windowResizing() {
             const chartContainer = document.getElementById("chartContainer");
             const statsDiv = chartContainer.querySelectorAll(".analyticsContainer")[1];
@@ -403,20 +440,13 @@
                 const columns = style.gridTemplateColumns.split(" ").length;
 
                 if (columns === 1) {
-                    // Move statsDiv before distDiv
                     chartContainer.insertBefore(statsDiv, distDiv);
-                    // chartContainer.style.marginRight = "50px";
-                    // chartContainer.style.marginLeft = "50px";
                 } else {
-                    // Make sure original order is restored if more than 1 column
                     chartContainer.insertBefore(distDiv, statsDiv);
                 }
             }
 
-            // Run on page load
             reorderGridIfOneColumn();
-
-            // Optional: Run on window resize to adapt dynamically
             window.addEventListener("resize", reorderGridIfOneColumn);
         }
         windowResizing();
