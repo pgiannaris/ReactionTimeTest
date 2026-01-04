@@ -112,12 +112,11 @@
         }
 
         .analyticsContainer:last-child h2 {
-            font-size: clamp(16px, 3.5vw, 20px);
             margin-bottom: 8px;
         }
 
         .analyticsContainer:last-child p {
-            font-size: clamp(13px, 2.5vw, 16px);
+            font-size: clamp(14px, 2.5vw, 18px);
             line-height: 1.5;
             margin-top: 8px !important;
         }
@@ -144,7 +143,7 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: break-word;
-            font-size: clamp(14px, 3vw, 18px);
+            font-size: clamp(12px, 3vw, 18px);
             line-height: 1.6;
             color: #444;
         }
@@ -212,16 +211,24 @@
             border-top: 1px solid rgba(0, 0, 0, 0.08);
         }
 
+        #footerGithub {
+            color: #444;
+            text-decoration: none;
+            transition: font-weight 0.2s ease;
+            transition: text-decoration 0.2s ease;
+        }
+
+        #footerGithub:hover {
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
         /* Tablet breakpoint */
         @media (max-width: 900px) {
             #chartContainer {
                 grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
             }
         }
-
-        /* Mobile breakpoint */
-
-        /* Very small mobile */
     </style>
     <body>
         <div id="container">
@@ -262,15 +269,15 @@
                 </p>
             </div>
         </div>
-        <footer class="site-footer">pgiannaris</footer>
+        <footer class="site-footer"><a href="https://github.com/pgiannaris/ReactionTimeTest" target="_blank" id="footerGithub">pgiannaris</a></footer>
     </body>
     <script>
-        let data = [];
+        let data = localStorage.getItem("data") ? localStorage.getItem("data").split(",") : [];
         let timeoutID = null;
         let myChart;
         let container = document.getElementById("container");
-        let max = 5;
-        let min = 4;
+        let max = 4000;
+        let min = 3000;
         let randomDelay;
         let h1Text = document.getElementById("text");
         let mainButton = document.getElementById("mainButton");
@@ -280,11 +287,11 @@
         let bestDisp = document.getElementById("bestDisp");
         let failed = false;
         let waiting = true;
-        let finished;
+        let finished = false;
 
         function mean(arr) {
             if (arr.length === 0) return 0;
-            return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+            return arr.reduce((s, v) => s + v, 0) / arr.length;
         }
 
         function updateStats() {
@@ -293,33 +300,26 @@
                 bestDisp.innerText = "Best: —";
                 return;
             }
-
             averageDisp.innerText = `Average: ${mean(data).toFixed(1)}ms`;
             bestDisp.innerText = `Best: ${Math.min(...data).toFixed(1)}ms`;
         }
 
-        updateStats();
-
         function percentileFromScore(score, mean = 273, std = 50) {
             let z = (mean - score) / std;
-            let percentile = 0.5 * (1 + erf(z / Math.sqrt(2)));
-            return (percentile * 100).toFixed(0);
+            return (0.5 * (1 + erf(z / Math.sqrt(2))) * 100).toFixed(0);
         }
 
         function erf(x) {
-            const a1 = 0.254829592;
-            const a2 = -0.284496736;
-            const a3 = 1.421413741;
-            const a4 = -1.453152027;
-            const a5 = 1.061405429;
-            const p = 0.3275911;
-
+            const a1 = 0.254829592,
+                a2 = -0.284496736,
+                a3 = 1.421413741;
+            const a4 = -1.453152027,
+                a5 = 1.061405429,
+                p = 0.3275911;
             let sign = x < 0 ? -1 : 1;
             x = Math.abs(x);
-
             let t = 1 / (1 + p * x);
             let y = 1 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-
             return sign * y;
         }
 
@@ -333,10 +333,7 @@
                         labels: data.map((_, i) => `${i + 1}`),
                         datasets: [
                             {
-                                label: "Reaction Time",
                                 data: data,
-                                borderColor: "rgb(43, 135, 209)",
-                                backgroundColor: "rgba(43, 135, 209, 0.2)",
                                 borderWidth: 2,
                                 fill: true,
                                 tension: 0.3,
@@ -344,21 +341,10 @@
                         ],
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
                         scales: {
-                            y: {
-                                beginAtZero: false,
-                                title: { display: true, text: "Milliseconds" },
-                            },
-                            x: {
-                                title: { display: true, text: "Attempt" },
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                display: false,
-                            },
+                            y: { title: { display: true, text: "Milliseconds" } },
+                            x: { title: { display: true, text: "Attempt" } },
                         },
                     },
                 });
@@ -368,7 +354,6 @@
                 myChart.update();
             }
         }
-        updateChart();
 
         function clearStorage() {
             data = [];
@@ -376,57 +361,60 @@
             updateStats();
         }
 
+        function handleClick(e) {
+            if (e.target.tagName === "BUTTON") return;
+
+            if (waiting) {
+                clearTimeout(timeoutID);
+                failed = true;
+                container.style.backgroundColor = "darkred";
+                h1Text.innerText = "Test Failed";
+                subText.innerText = "Clicked too soon!";
+                mainButton.innerText = "Retry";
+                mainButton.style.display = "block";
+                return;
+            }
+
+            if (startTime !== null && !finished) {
+                finished = true;
+                const reactionTime = performance.now() - startTime;
+                container.style.backgroundColor = "#2b87d1";
+                h1Text.innerText = `${reactionTime.toFixed(1)}ms`;
+                subText.innerText = `Your percentile: ${percentileFromScore(reactionTime)}%`;
+                data.push(+reactionTime.toFixed(1));
+                localStorage.setItem("data", data);
+                updateChart();
+                updateStats();
+                mainButton.innerText = "Retry";
+                mainButton.style.display = "block";
+            }
+        }
+
+        container.addEventListener("pointerdown", handleClick);
+
         function main() {
             if (timeoutID) clearTimeout(timeoutID);
+
             startTime = null;
             waiting = true;
             failed = false;
             finished = false;
 
             randomDelay = Math.floor(Math.random() * (max - min + 1)) + min;
+
             mainButton.style.display = "none";
             h1Text.innerText = "Wait";
             subText.innerText = "";
             container.style.backgroundColor = "#B80C09";
 
             timeoutID = setTimeout(() => {
-                if (!failed && !finished) {
-                    startTime = performance.now();
+                if (!failed) {
                     waiting = false;
+                    startTime = performance.now();
                     container.style.backgroundColor = "green";
                     h1Text.innerText = "Click!";
-                    container.addEventListener("pointerdown", handleClick);
                 }
-            }, randomDelay * 1000);
-
-            function handleClick(e) {
-                e.stopPropagation();
-                if (!container.contains(e.target)) return;
-                if (e.target.tagName === "BUTTON") return;
-
-                if (waiting) {
-                    clearTimeout(timeoutID);
-                    failed = true;
-                    container.style.backgroundColor = "darkred";
-                    subText.innerText = "Clicked too soon!";
-                    h1Text.innerText = "Test Failed";
-                    mainButton.style.display = "block";
-                    mainButton.innerText = "Retry";
-                    container.removeEventListener("pointerdown", handleClick);
-                } else if (startTime !== null) {
-                    const reactionTime = performance.now() - startTime;
-                    finished = true;
-                    container.removeEventListener("pointerdown", handleClick);
-                    container.style.backgroundColor = "#2b87d1";
-                    h1Text.innerText = `${reactionTime.toFixed(1)}ms`;
-                    subText.innerText = `Your percentile: ${percentileFromScore(reactionTime)}%`;
-                    data.push(Number(reactionTime.toFixed(1)));
-                    updateChart();
-                    updateStats();
-                    mainButton.innerHTML = "Retry";
-                    mainButton.style.display = "block";
-                }
-            }
+            }, randomDelay);
         }
 
         function windowResizing() {
@@ -434,21 +422,17 @@
             const statsDiv = chartContainer.querySelectorAll(".analyticsContainer")[1];
             const distDiv = chartContainer.querySelectorAll(".analyticsContainer")[0];
 
-            function reorderGridIfOneColumn() {
-                const style = window.getComputedStyle(chartContainer);
-                const columns = style.gridTemplateColumns.split(" ").length;
-
-                if (columns === 1) {
-                    chartContainer.insertBefore(statsDiv, distDiv);
-                } else {
-                    chartContainer.insertBefore(distDiv, statsDiv);
-                }
+            function reorder() {
+                const cols = getComputedStyle(chartContainer).gridTemplateColumns.split(" ").length;
+                chartContainer.insertBefore(cols === 1 ? statsDiv : distDiv, chartContainer.firstChild);
             }
 
-            reorderGridIfOneColumn();
-            window.addEventListener("resize", reorderGridIfOneColumn);
+            reorder();
+            window.addEventListener("resize", reorder);
         }
+
         windowResizing();
+        updateStats();
+        updateChart();
     </script>
 </html>
-
