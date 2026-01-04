@@ -272,7 +272,9 @@
         <footer class="site-footer"><a href="https://github.com/pgiannaris/ReactionTimeTest" target="_blank" id="footerGithub">pgiannaris</a></footer>
     </body>
     <script>
-        let data = localStorage.getItem("data") ? localStorage.getItem("data").split(",") : [];
+        let data = localStorage.getItem("data")
+    ? localStorage.getItem("data").split(",").map(Number)
+    : [];
         let timeoutID = null;
         let myChart;
         let container = document.getElementById("container");
@@ -436,3 +438,4 @@
         updateChart();
     </script>
 </html>
+
